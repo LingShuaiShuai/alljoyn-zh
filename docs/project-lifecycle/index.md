@@ -139,89 +139,59 @@
  每个项目必须是一个单一工作组的成员。建立工作小组和位置的项目应该仔细考虑减少的风险碎片。
  该创建新的工作小组只有当它是逻辑清楚,一个项目不符合逻辑范围内现有的工作小组。
 
-### Working Group States
+### 工作组状态
 
-| Working Groups | Description
+| 工作组状态     |描述
 |----------------|-----------------------
-| Proposed	     | A Project has been accepted into the Mature 
-|                | state, does not fit within the scope of any 
-|                | other Working Group, and requires a new 
-|                | Working Group to be created.
-| Active         | Working Group contains one or more Projects 
-|                | in the Mature state, and a Working Group Chair 
-|                | is actively participating in the Technical
-|                | Steering Committee.
-| Archived       | Working Group has no remaining Projects in 
-|                | the Mature state, and has been pruned from the
-|                | project.
+| 计划	          | 项目已被接受进入成熟状态,不符合范围内的其他工作小组,并要求要创建一个新的工作小组。
+| 活跃           | 工作组包含一个或多个项目的成熟状态,并且工作组主席积极参与到技术指导委员会中去。
+| 存档           | 工作组已在成熟的状态，没有剩余的项目，该项目已被删节。
 
-### Working Group State Transitions
+### 工作组状态转换
 
-The valid transitions (and their associated reviews) are:
+有效的转换(及其相关评审):
 
-| From State   | To State  | Review
+| 起始阶段     | 目的阶段  |审核
 |--------------|-----------|--------
-| &lt;null&gt; | Active    | Creation Review
-| Active       | Archived  | Termination Review
+| &lt;null&gt; | 活跃期    | 创建评审
+|  活跃期      | 孵化      | 终止审查
 
-### Review Processes
+### 审查过程
 
-For each review, there will be a publicly visible wiki/web 
-template filled out containing the relevant review information, 
-as outlined in the sections below.
+对于每一个评论,会有一个公开可见的wiki / web模板包含相关评论信息的填写,如下的章节中概述。
 
-The review document must be posted and announced for public 
-comment for at least 2 weeks prior to the date the review 
-is scheduled, to give participants sufficient time to decide.
+评审文档必须为公众意见发布并宣布日期前至少2周的审核计划,以便给参与者足够的时间来决定。
 
-Reviews ideally should be conducted in a manner that is sensitive 
-to the global nature of the community (i.e., the geography and 
-time zone dispersion).
+审查理想情况下应该进行的方式，它对全球性社区反应很敏捷(即,地理位置和时区色散)。
 
-#### Creation Review process and criteria
+#### 创建审查过程和标准
 
-  1. Project makes request for a new Working Group during 
-     [Graduation Review][graduation-review]
-     a. Justifies need for a new Working Group instead of 
-        joining an existing one
-     b. Nominates the Working Group Chair
-  2. Review by TSC and approval
+  1.项目申请新工作小组
+     [通过审核审查][graduation-review]
+     a. 证明需要一个新的工作组代替加入一个现有的
+     b. 提名工作小组主席
+  2. TSC的审查和批准
 
 [graduation-review]: #graduation-review-process-and-criteria
 
-### Termination
+### 终止
 
-Working Group termination is initiated automatically and 
-immediately when the last Mature Project has been removed.
-Situations in which this may occur include:
+工作组终端会自动启动，并立即当最后成熟项目已被删除。在此可能出现的情况包括：
 
-  * No Projects remain in the Mature state
-  * Projects have been consolidated and transferred 
-    to another Working Group
+  * 没有项目仍在成熟的状态
+  *项目已经巩固和转移到另一个工作小组
 
-Working Groups with at least one Mature Project cannot be terminated. 
+工作小组至少有一个成熟的项目不能被终止。
 
-## Bootstrap Process
+## 引导过程
 
-At the time of the formation of the Alliance, there are expected
-to be several initial Projects contributed. These initial 
-Projects will come in at various levels of maturity. In order 
-to sort these Projects into the most appropriate Lifecycle state 
-and Working Groups in a way that is clear, consistent, and fair:
+在联盟的形成时，有预期给最初的几个项目做出了贡献。这些初步的项目将在各级成熟起来。为了将这些项目纳入的方式，是明确的，一贯的，公平的和最合适的生命周期状态和工作组进行排序：
 
-  1. Prior to a date to be decided by the TSC in its first 
-     meeting not less than 1 month and not more than 6 months 
-     after the Alliance launches, a Project may decide to either
-     a. Seek entry in ‘bootstrap’ state (explained more below)
-     b. Seek entry via the steady state Project Lifecycle (ie,
-        propose for Incubation)
-  2. If a Project enters is in ‘bootstrap’ state, at the first
-     meeting of the official (post-formation) TSC after it 
-     petitions to exit bootstrap state, the TSC will decide 
-     the proper Project Lifecycle state and Working Group for 
-     the Project based on criteria rooted in the steady state 
-     Project Lifecycle.
-  3. Once in a non-bootstrap state, a Project follows the 
-    steady state Project Lifecycle.
+  1. 日期之前决定的TSC在其第一次会议不少于1个月以上6个月后,联盟启动,一个项目可能会决定
+a.寻求进入“引导”状态(下面详细解释)
+b.寻求条目通过稳态项目生命周期(即提出孵化)
+  2.如果一个项目进入处于“引导”状态,在官方的第一次会议(post-formation)TSC请愿后退出引导状态,TSC将决定适当的项目生命周期状态和项目工作小组根据标准基于稳态项目生命周期。
+  3.在哪些国家,遵循一个项目
+   稳态项目生命周期。
 
 [proposal-template]: https://wiki.allseenalliance.org/develop/proposing_a_project
