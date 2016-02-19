@@ -1,154 +1,93 @@
-# AllJoyn&trade; Security
+# AllJoyn&trade; 安全
 
-## Overview
+## 综述
 
-The AllJoyn system provides a security framework for applications
-to authenticate each other and send encrypted data between them.
-The AllJoyn framework provides end-to-end application level security.
-Authentication and data encryption are done at the application.
-These applications can reside on the same device or on different
-devices, and can be attached to the same AllJoyn router or
-different AllJoyn routers.
+该AllJoyn系统为应用程序提供一个安全框架相互认证和它们之间发送加密数据。在AllJoyn框架提供终端到终端的应用层安全。身份验证和数据加密是在应用程序完成的。这些应用程序可以驻留在同一设备上或在不同设备，并且可以连接到相同AllJoyn路由器或不同的AllJoyn路由器。
 
-**NOTE:** No authentication is done at the AllJoyn router layer.
+* *注意:* *没有完成身份验证AllJoyn路由器层。
+AllJoyn框架支持安全级别的接口。应用程序可以标记一个接口为“安全”，以使之身份验证和加密。
+所有的方法中，信号，和一个安全界面的性质被认为是安全的。当消费者应用程序调用安全接口上的方法调用，或明确地调用的API时候，身份验证 - 和加密相关的密钥交换，以确保与远程对等应用程序的连接需求启动。
 
-The AllJoyn framework supports security at the interface level.
-An application can tag an interface as 'secure' to enable
-authentication and encryption. All of the methods, signals,
-and properties of a secure interface are considered secure.
-Authentication- and encryption-related key exchange are
-initiated on demand when a consumer application invokes a
-method call on a secure interface, or explicitly invokes an
-API to secure the connection with a remote peer application.
+下图显示了高层次的AllJoyn的安全架构。
 
-The following figure shows the high-level AllJoyn security architecture.
+![alljoyn-安全-拱][alljoyn-security-arch]
 
-![alljoyn-security-arch][alljoyn-security-arch]
+**图:* * AllJoyn安全架构
 
-**Figure:** AllJoyn security architecture
+身份验证和加密是在应用程序层完成的。
+AllJoyn核心库实现的所有逻辑进行身份验证和加密除了Auth侦听器。Auth侦听器是一个回调函数实现的应用程序提供身份验证凭据(如。PIN或密码)或验证身份验证凭据(如，在ALLJOYN_ECDHE_ECDSA中验证证书链。）身份验证和加密密钥存储在密钥存储管理的安全模块中。
 
-Authentication and encryption is done at the application layer.
-The AllJoyn core library implements all of the logic for authentication
-and encryption except the Auth Listener. The Auth Listener is a callback
-function implemented by the application to provide auth credentials
-(e.g., PIN or password) or verify auth credentials (e.g., verify
-certificate chain in case of ALLJOYN_ECDHE_ECDSA). Authentication
-and encryption keys are stored in a key store managed by
-the Security module.
+* *注意:* * AllJoyn路由器只是参与传输
+与安全相关的应用程序端点之间的消息。它本身没有实现任何安全逻辑。
 
-**NOTE:** The AllJoyn router is only involved in transmitting
-security-related messages between application endpoints.
-It does not implement any security logic itself.
+简单身份验证和AllJoyn框架使用安全层(SASL)安全框架进行身份验证。它使用d - bus的身份验证协议(d-bus规范)(http://dbus.freedesktop.org/doc/dbus specification.html)交换身份验证相关数据。
 
-The AllJoyn framework uses the Simple Authentication and
-Security Layer (SASL) security framework for authentication.
-It makes use of D-Bus defined SASL protocol
-[D-Bus Specification](http://dbus.freedesktop.org/doc/dbus-specification.html)
-for exchanging authentication related data.
+AllJoyn框架支持以下身份验证机制应用到应用级别的身份验证:
 
-The AllJoyn framework supports the following auth mechanisms
-for app-to-app level authentication:
-
-* ALLJOYN_SRP_KEYX - Secure Remote Password (SRP) key exchange
-* ALLJOYN_SRP_LOGON - Secure Remote Password (SRP) logon with username and password
-* ALLJOYN_ECDHE_NULL - Elliptic Curve Diffie-Hellman (ephemeral) key exchange
-  with no authentication
-* ALLJOYN_ECDHE_PSK -  Elliptic Curve Diffie-Hellman (ephemeral) key exchange
-  authenticated with a pre-shared key (PSK)
-* ALLJOYN_ECDHE_ECDSA - Elliptic Curve Diffie-Hellman (ephemeral) key exchange
-  authenticated with an X.509 ECDSA certificate
+* ALLJOYN_SRP_KEYX - 安全远程密码(SRP)密钥交换
+* ALLJOYN_SRP_LOGON -安全远程密码(SRP)与用户名和密码登录
+* ALLJOYN_ECDHE_NULL - 椭圆曲线diffie - hellman(短暂)没有认证密钥交换
+* ALLJOYN_ECDHE_PSK -  椭圆曲线diffie - hellman(短暂)密钥交换身份验证pre-shared键(相移键控)
+* ALLJOYN_ECDHE_ECDSA -椭圆曲线diffie - hellman密钥交换(短暂)验证一个X.509 ECDSA证书
 
 
-The AllJoyn framework also supports ANONYMOUS and EXTERNAL
-auth mechanisms as defined by the D-Bus specification.
+AllJoyn框架还支持匿名和外部身份验证机制作为d - bus规范定义
 
-* The ANONYMOUS auth mechanism is used between two AllJoyn
-routers for null authentication. It is also used for authentication
-between a thin app and an AllJoyn router.
-* The EXTERNAL auth mechanism is used between an application
-and the installed AllJoyn router (standalone AllJoyn router)
-on the Linux platform.
+*两个AllJoyn路由器之间使用匿名身份验证机制为空验证。它也用于身份验证一个薄应用和一个AllJoyn路由器之间。
+**使用外部身份验证机制之间的应用及安装AllJoyn路由器(独立AllJoyn路由器)在Linux平台上。
 
-### Security changes in the 14.06 release
+### 安全在14.06版本中的变化
 
-In the 14.06 release, the ALLJOYN_PIN_KEYX auth mechanism
-is removed from the AllJoyn thin core library. This auth
-mechanism continues to be supported by the AllJoyn standard
-core library.
+14.06版本的发布,ALLJOYN_PIN_KEYX身份验证机制从AllJoyn薄核心库中删除。
+这种身份验证机制仍然被AllJoyn标准核心库支持。
 
-The following new Elliptic Curve Diffie-Hellman Ephemeral
-(ECDHE) based auth mechanism are added:
+以下新的椭圆曲线的Diffie-Hellman短暂（ECDH）的身份验证机制进行补充道：
 
-* ECDHE_NULL is key agreement without authentication
-* ECDHE_PSK is a key agreement authenticated with a pre-shared
-symmetric key.
-* ECDHE_ECDSA is a key agreement authenticated with an asymmetric
-key validated with an ECDSA signature.
+* ECDHE_NULL没有身份验证是关键协议
+* ECDHE_PSK是一个关键的协议验证pre-shared对称密钥。
+* ECDHE_ECDSA是一个关键的协议认证与非对称密钥验证ECDSA签名。
 
-These new auth mechanisms can be used by both thin apps and
-standard apps. Thin apps in the 14.06 release support only
-ECDHE-based auth mechanisms.
+在瘦薄应用程序和标准应用程序中都可以使用这些新的身份验证机制。薄应用程序的14.06版本只支持ECDHE-based身份验证机制。
 
-Use of SASL protocol for authentication is removed from the
-AllJoyn thin core library in the 14.06 release, and will
-continue to be supported in AllJoyn standard core library.
+在14.06版本中，使用SASL协议认证从AllJoyn瘦核心库中除移,并将继续支持AllJoyn标准核心库。
 
-For more information about these changes, see the latest version
-of the [Security HLD](https://wiki.allseenalliance.org/core/security_enhancements).
+关于这些变化的更多信息,请参见最新版本的[安全HLD](https://wiki.allseenalliance.org/core/security_enhancements).
 
-### Security changes in the 15.04 release
+### 安全15.04版本的变化
 
-In the 15.04 release, the ALLJOYN_PIN_KEYX and ALLJOYN_RSA_KEYX authentication
-mechanisms have been removed from the standard client.  Support for ECDSA X.509
-was added.
 
-## Security concepts
+在15.04版本中,ALLJOYN_PIN_KEYX和ALLJOYN_RSA_KEYX从标准客户端身份验证机制已被移除。对ECDSA x
+的支持被补充了。
 
-This section defines the AllJoyn security-related concepts.
+# #安全概念
 
-### Authentication (Auth) GUID
+本节定义了AllJoyn安全相关概念。
 
-The Authentication GUID is a GUID assigned to an application
-for authentication purposes. This GUID is persisted in the
-key store and provides a long-term identity for the application.
-Typically, this GUID is associated with a single application.
-In the scenario where a group of related applications share
-a given key store, they also share the same auth GUID.
+# # #认证(Auth)全局唯一标识符
 
-This GUID is used as a mapping key for storing and accessing
-authentication and encryption keys for the associated application.
+身份验证全局唯一标识符是分配给应用程序的全局唯一标识符，来进行身份验证的这个全局唯一标识符坚持密钥存储,为应用程序提供了一个长期的身份。通常,这全局唯一标识符与单个应用程序相关联。在方案中，其中一组相关的应用程序共享一个给定的密钥存储，他们也有着相同的全局唯一标识认证。
 
-### Master secret
+该全局唯一标识用作映射键来存储和访问身份验证和加密密钥相关联的应用程序。
 
-The master secret is a key shared between authenticated peer
-applications. Two peer applications generate the same master
-secret independently, and store it persistently in the key store.
+###主密钥
 
-The master secret is stored per Auth GUID for peer applications,
-and has an associated TTL settable by the application.
-As long as the master secret is valid, peer applications
-do not have to reauthenticate with each other to exchange encrypted data.
+主秘钥是一个经过身份验证的对等应用程序之间共享的关键。 
+两个对等的应用程序独立生成相同的主秘钥,并持续存储它在密钥存储库中。
 
-The master secret is 48 bytes in length as per [RFC 5246](http://www.rfc-base.org/txt/rfc-5246.txt).
 
-### Session key
+主秘钥被存储在每个认证全局唯一标识符的对等应用程序中,和应用程序都有一个关联、可变的TTL。一旦主秘钥是有效的,对等应用程序不必一对一重新认证来互相交换加密数据。
 
-A cryptographic key used to encrypt point-to-point data
-traffic between two peer applications. A separate session key
-is maintained for every connected peer application. A session
-key is valid as long as peers are connected (over any AllJoyn session).
-It is a session in the cryptographic sense and not related to
-an AllJoyn session. The same session key is used across all
-AllJoyn sessions between two peers.
+主密钥长度为48字节按照[RFC5246](http://www.rfc-base.org/txt/rfc-5246.txt).
 
-Session keys are stored in the memory, they are not persisted.
-The session key is generated after a peer application has been
-authenticated, and it expires for a peer application when
-the connection is terminated with that peer. The session key
-is derived from the master secret, and is used to encrypt
-method calls, method replies, and unicast signals.
+### 会话密钥
 
-The session key is 128 bits long.
+一个密钥用于加密点对点两个对等的应用程序之间的数据流量。单独的会话密钥维护每个连接对等应用程序。一个会话密钥是有效的,只要同行(超过任何AllJoyn会话)相连。它是在密码意义上的会话，并没有涉及到一个AllJoyn会话。相同的会话密钥是在所有AllJoyn会话使用的两个邻居。
+
+会话密钥存储在存储器中，它们不存在。
+生成会话密钥的对等的应用已经经过
+验证，并且当连接终止与对等到期要对等应用程序。会话密钥是从主密钥导出，用于加密方法调用，方法回复，和单播信号。
+
+会话密钥是128位长。
 
 **NOTE:** The current implementation has a default TTL of 2 days
 for session keys. If applications remain connected that long,
