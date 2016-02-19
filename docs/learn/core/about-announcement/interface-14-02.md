@@ -78,8 +78,6 @@ About接口的方法调用将使用AllJoyn错误消息处理功能(ER_BUS_REPLY_
 
 ###方法
 
-The following methods are exposed by a BusObject that implements 
-the org.alljoyn.About interface.
 以下方法被BusObject揭露，实现org.alljoyn 。About界面。
 #### 获取About数据
 
@@ -113,7 +111,7 @@ the org.alljoyn.About interface.
 | 应用编号 | yes | yes | no | ay | 应用程序的全局唯一标识符。 |
 | 默认语言 | yes | yes | no | s | 设备支持的默认语言。指定为RFC5646中列出的IETF语言标记。 |
 | 设备名称 | yes | yes | yes | s | 特定于平台的方式（如Linux和Android）设置设备的名称。 |
-|设备ID | yes | yes | no | s | Device identifier set by platform-specific means. |
+|设备ID | yes | yes | no | s | 设备标识符设定的特定于平台的意思。 |
 | 应用名称 | yes | yes | yes | s | 应用程序名称由应用程序制造商指定(开发人员或OEM)。|
 | 制造商 | yes | yes | yes | s | 制造商的应用程序的名称。|
 | 型号 | yes | yes | no | s | 该应用程序的型号。 |
