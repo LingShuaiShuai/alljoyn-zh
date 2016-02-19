@@ -1,3 +1,3 @@
-# Use Cases
+# 用例
 
-Use Cases will be added very soon. Stay tuned!
+用例将会被很快添加。敬请关注！
