@@ -89,303 +89,171 @@ AllJoyn框架还支持匿名和外部身份验证机制作为d - bus规范定义
 
 会话密钥是128位长。
 
-**NOTE:** The current implementation has a default TTL of 2 days
-for session keys. If applications remain connected that long,
-the associated session key expires and a new session key would
-need to be generated.
+* *注意:* *当前的实现有一个默认的TTL两天的会话密钥。如果应用程序保持联系很长时间,相关的会话密钥和一个新的会话密钥到期需要生成。
 
-### Group key
+### 组密钥
 
-The group key is a cryptographic key used to encrypt
-point-to-multipoint data traffic (broadcast signals) sent
-out by a provider application. A single group key is maintained
-by an application to encrypt broadcast signals sent to every
-connected peer application.
+组密钥是一个用于加密由提供商应用程序发送出点对多点的数据流量（广播信号）的加密密钥。一组的单一的组密钥是由应用程序加密广播信号发送到每个对等连接应用程序。
 
-A group key is generated when an application generates the
-very first session key for any connected peer. The group key
-is always generated independent of the provider or consumer
-role of an application. Only provider applications use the
-group key to send out encrypted broadcast signals. Applications
-exchange their group keys using an encrypted method call that
-involves the session key.  
+当一个应用程序生成，生成一组关键对于任何连接同行的第一个会话密钥。组密钥生成总是独立于应用程序的提供者或使用者的角色。只有提供者应用程序使用该密钥发送加密的广播信号。应用程序交换组键使用一个涉及到会话密钥加密的方法调用。
 
-The group key is 128 bits long and randomly generated.
-The group key is directional in nature. Each application has
-its own group key to encrypt broadcast signals. In addition,
-it also maintain a separate peer group key for each of the
-connected peer for decrypting broadcast signals received from them.
+该组密钥是128位长,随机生成的。该组密钥在本质上是定向。每个应用程序都有自己的组密钥来加密广播信号。此外,它还维护一个单独的同龄群体主要为每个连接对等的解密广播信号收到他们。此外，它也保持为每个所连接的对等体，用于解密从它们接收的广播信号的独立对等体组密钥。
 
-Group keys are stored in the memory, they are not persisted.
-The group expires when the connection ends with peer
-applications. An application's own group key will expire when
-it no longer has any connections with any of its peers.
-The group key for a remote peer will expire when the application
-no longer has a connection with that peer.
+组密钥存储在内存中,它们不被保留。该组与对等应用程序连接结束时到期。应用程序的组密钥到期时，不再有任何同行联系。当应用程序不再和同行有联系时，远程对等组密钥将到期。
 
-**NOTE:** In future releases, group keys may be persisted to
-support encryption for sessionless signals.
+**注：**在未来的版本中，组密钥或继续支持无会话信号的加密。
 
-### Key store
+### 密钥存储
 
-The key store is a local storage used to persistently store
-authentication-related keys, and to store master secret and
-associated TTL. Applications can provide their own implementation
-of the key store or use the default key store provided by the AllJoyn system.
+密钥存储是用于持久存储本地存储认证相关密钥，以及存储主密钥和相关TTL。应用程序可以提供自己的实现密钥存储或使用由AllJoyn系统提供的默认密钥库。
 
-Multiple applications on a device can share a given key store.
-In this case, those applications share the same set of
-authentication keys. In the current implementation, content
-inside the key store is encrypted with a key derived from the key store path.
+设备上的多个应用程序可以共享一个给定的密钥存储。在这种情况下，这些应用程序共享同一组的验证密钥。在当前实现中,用密钥加密的密钥存储库中的内容源自密钥存储路径。
 
-For every authenticated application, the key store maintains
-the master secret and the associated TTL per Auth GUID of that
-application. It also maintains the auth GUID assigned to the
-local applications that are using the key store.
+ 对于每一个应用程序认证，密钥存储保持主密钥和每个身份验证全局唯一标识应用程序的相关TTL。也是维护分配给正在使用的密钥存储在本地应用程序的权威性GUID。
 
-The following table shows an example key store with master
-secret stored for two peer applications.
+下面的表显示了一个示例与主秘密密钥存储库中存储两个对等的应用程序。
 
-#### Key store example with master secret stored for two peer applications
+#### 密钥存储库与主秘密存储两个对等的应用程序示例
 
-**Local Auth GUID - GUIDx**
+**本地 身份验证 全局唯一标识符 - 全局唯一标识符x**
 
-| Peer Auth GUID | Master secret | TTL |
+| 对等认证 全局唯一标识符| 主密钥 | TTL |
 |---|---|---|
-| GUID1 | MS1 | T1 |
-| GUID2 | MS2 | T2 |
+| 全局唯一标识符1 | MS1 | T1 |
+| 全局唯一标识符2 | MS2 | T2 |
 
-## End-to-end security flow
+## 端到端安全流
 
-The following figure captures the high-level end-to-end
-message flow for AllJoyn security for the use case when
-two applications have not authenticated with each other
-before. The security message flow is initiated based on one
-of the following triggers:
+下图捕获为AllJoyn安全的使用情况的高层次的端至端的消息流，当两个应用程序都不能互相验证之前。安全消息流发起基于以下触发器之一：
 
-* Consumer app invoking a secure method call on a remote
-service object or
-* Consumer app explicitly invoking an API to secure the
-connection with the remote peer
+*消费者应用程序调用一个安全的方法给远程服务对象或
+*消费者应用程序明显地调用一个API来保障与远程对等的连接。
 
 ![e2e-security-flow-two-unauth-apps][e2e-security-flow-two-unauth-apps]
 
-**Figure:** End-to-end security flow (two applications have not authenticated with each other before)
+**图:**端到端安全流(两个应用程序没有相互身份验证之前)
 
-It is ideal for an application to always explicitly secure
-the connection with the remote peer. In the case when an
-application is just interested in receiving secure signals,
-that is the only way to secure the connection with the
-remote peer in order to receive keys for decrypting signals.
+它是理想的应用程序总是明确地保护与对端的连接。在当一个应用程序仅仅是对接收安全的信号有兴趣的话，那就是保护与对端的连接，以获得钥匙解密信号的唯一途径。
 
-The AllJoyn core library attached with the application
-implements all of the AllJoyn security logic. The AllJoyn
-router only acts as a pass-through for security-related messages.
-Each application needs to invoke EnablePeerSecurity API call
-with the AllJoyn core library to enable AllJoyn security.
-The application specifies authentication mechanism to be used,
-the Auth Listener for callback and the key store file as part
-of this API call. It also indicates whether key store can
-be shared. The AllJoyn core library generates the auth GUID
-for the application as part of first-time initialization of
-the key store. The auth GUID gets stored in the key store.
+连接与应用程序的AllJoyn核心库实现了所有的AllJoyn安全逻辑。AllJoyn路由器只充当一个传递安全相关的消息。每个应用程序需要调用启用对等安全性的API调用与AllJoyn核心库，以使AllJoyn具有安全性。应用程序使用指定的身份验证机制,身份验证回调侦听器和密钥存储文件作为API调用的一部分。它还表明是否可以共享密钥存储库。AllJoyn核心库生成应用程序的身份验证全局唯一标识符，作为首次密钥存储库初始化的一部分。身份验证全局唯一标识符被存储在密钥存储库中。
 
-After establishing a session with the provider app, the consumer
-app initiates one of the security triggers mentioned above.
-The AllJoyn Core library checks to see if authentication
-is already in progress.
+与提供者应用程序建立一个会话后,消费者应用程序启动上述安全触发器之一。AllJoyn核心库检查是否认证已经在进行中。
 
-* If yes, it stops.
-* If no, it continues with the security flow.
+*如果是的,它停了下来。
+*如果不,继续安全流动。
 
-It looks for the key material for remote peer. In this case,
-since this is the first secure interaction with the remote
-app, no key material is found. This will trigger security
-flow with the remote peer.
+它看起来为远程对等的关键材料。在这种情况下,因为这是第一个安全交互与远程应用程序,没有找到关键材料。这将触发安全流与远程对等。
 
-The message flow consists of following four distinct
-steps in that order:
+消息流包含以下四个不同的步骤:
 
-1. Exchange Auth GUIDs: This step involves exchanging Auth
-GUIDs between peer applications. Once learned, the remote
-app auth GUID is used to see if the master secret is present
-for that auth GUID in the key store. In this case, no master
-secret is found since the two apps have not authenticated
-with each other.
-2. App-to-App authentication: This step involves two peers
-authenticating each other using one of the supported auth
-mechanisms. At the end of this step, two peers have authenticated
-each other and now share a common master key.
-3. Generate a session key: This step involves two peers
-generating a session key to be used for encrypting secure
-point-to-point messages between them. The session key is
-generated independently by both the peers based on the
-shared master key. A group key is also generated when the
-first session key is generated.
-4. Exchange group keys: This step involves two peers exchanging
-their own group keys with each other via an encrypted
-AllJoyn message. The AllJoyn message gets encrypted using
-the session key already established between two peers.
-The group key is used by the application to encrypt session
-multicast and broadcast signals. At the end of this step,
-two peer applications have group keys to decrypt secure
-broadcast signals received from each other.
+1. 交换身份验证 全局唯一标识符: 这一步涉及到对等应用程序之间交换身份验证全局唯一标识符。一旦学会了,远程应用身份验证全局唯一标识符将被用来监督主秘钥是否存在于密钥存储库中的身份验证全局唯一标识符。在本例中,没有找到主秘钥,因为两个应用程序没有相互验证。
 
-Details for each of these steps are described in the
-following sections. After completing these steps, peer
-applications have now established encryption/decryption
-keys to exchange encrypted method calls and signals.
+2. 应用到应用的认证:这一步涉及两个同行验证对方其中一个身份验证相互验证机制。在这一步的结尾,两个同伴相互验证,现在共享一个共同的主密钥。
 
-These keys are managed as part of a peer state table
-which includes a unique name for the remote peer, as well
-as a local auth GUID and group key for the current application.
+3. 生成会话密钥:这一步涉及两个同行生成会话密钥用于加密点对点消息之间的安全。会话密钥生成独立的基于共享主键的同行。产生第一个会话密钥时，也会生成一组密钥。
 
-The following table provides a sample peer state table with
-keys stored for two authenticated peer applications.
+4. 交易组密钥: 这一步涉及两个同伴相互交换自己的组密钥通过一个加密AllJoyn消息。所述AllJoyn消息是利用两个对等端之间已经建立的会话密钥进行加密。应用程序使用组密钥加密会话多播和广播信号。在此步骤结束时，两个对等应用程序具有组密钥来解密从彼此接收到的安全广播信号。
 
-#### Sample peer state table for two authenticated peer applications.
+对每个步骤的细节在下面的章节中都进行了描述。完成这些步骤之后,对等应用程序现在已经建立了加密/解密密钥交换加密的方法调用和信号。
 
-**Local Auth GUID - GUIDx**
-**App Group Key - GKx**
+这些密钥作为对等状态表,，其中包括远程对等的唯一名称，以及当前应用程序的本地身份验证全局唯一标示符和组密钥的一部分来管理。
 
-| Peer Auth GUID | Unique name | Session key | Peer group key |
+下表提供存储了两个认证对等应用程序密钥的示例对等体状态表。
+
+#### 两个互相验证的对等的应用程序的样本对等状态表
+
+**本地认证全局唯一标示符 - 全局唯一标示符**
+**应用程序组密钥 - GKx**
+
+| 对等认证全局唯一标示符 |唯一名称 |会话密钥 | 对等组密钥 |
 |---|---|---|---|
 | GUID1 | :100.2 | SK1 | GK1 |
 | GUID2 | :200.2 | SK2 | GK2 |
 
-## Already authenticated apps
+## 已通过身份验证的应用程序
 
-When apps connect with each other subsequent to their first
-connection, they do not need to authenticate again with each
-other if the master secret is still valid. The following figure
-shows security flow for this use case.
+当应用程序连接彼此之后他们第一次连接时,如果主秘密仍然是有效的，他们不需要再次验证彼此。下图显示了这个用例的安全流动。
 
-![authenticated-apps-reconnecting][authenticated-apps-reconnecting]
+![认证 - 应用程序 - 重新连接][authenticated-apps-reconnecting]
 
-**Figure:** Authenticated apps connecting again
+**图:**再次验证应用程序连接
 
-In this case, since the apps were not connected, no key material
-is found for the remote peer. As a result, the consumer app
-performs the Exchange Auth GUIDs step with the remote peer.
-This retrieves the Auth GUID for the remote peer that can
-be used for lookup in the key store file.
+在这种情况下,由于发现远程对等的应用程序没有连接,没有关键材料。 这样一来, 消费者应用程序执行与远程对等交换身份验证全局唯一标示符这一步.
+这个检索远程对等的身份验证全局唯一标示符可用于查找密钥存储文件。
 
-Since the apps have already authenticated, a master secret
-is found in the key store for the auth GUID of the provider
-app and no app-to-app authentication needs to occur.
-The consumer app directly goes to the next step of generating
-session key and/or group key.
+由于应用程序已经通过身份验证，一个主秘钥被发现在密钥存储库中，为了身份验证全局唯一标示符的提供者应用程序 以及没有出现应用程序间互相验证的需要。 消费者应用程序直接进入下一步生成会话密钥和/或组密钥。
 
-**NOTE:** If the verification step fails during session key
-generation, the consumer app must re-authenticate with
-the provider even if master secret is still valid.
+**注：**如果验证步骤会话密钥的生成过程中出现故障，消费者应用程序必须与供应商重新认证，即使主密钥仍然是有效的。
 
-## Exchange of Auth GUIDs
+## 交换身份验证全局唯一标识符
 
-The following figure shows the message flow for the exchange
-of Auth GUIDs between peer applications.
+下图显示了消息流对等应用程序之间交换身份验证的全局唯一标识符。
 
-![exchange-auth-guids][exchange-auth-guids]
+![交换-验证-全局唯一标识符][exchange-auth-guids]
 
-**Figure:** Exchange of Auth GUIDs
+**图:** 交换身份验证的全局唯一标识符
 
+消息流的步骤如下所述。
 The message flow steps are described below.
 
-1. The consumer app generates an ExchangeGuids METHOD_CALL
-message and sends it to the provider app via the AllJoyn router.
-This message includes the Auth GUID of the consumer app and
-the maximum Auth version supported by the consumer app.
-2. The provider app proposes its max auth version if it
-does not support the auth version received from the consumer app.
-3. The provider app generates an ExchangeGuids METHOD_RETURN
-message and sends it to the consumer app via the AllJoyn router.
-This message includes the Auth GUID of the provider app and
-the max auth version of the provider app.
-4. The consumer app verifies that it supports the received
-auth version. This completes the Exchange GUIDs step.
+1. 消费者应用程序生成一个交换全局唯一标识符的METHOD_CALL消息并将其通过AllJoyn路由器发送到提供者应用程序。这个消息包括消费者应用程序的身份验全局唯一标识符和最大的身份验证消费者应用程序支持的版本。
 
-## App-to-app authentication
+2.如果它不支持从消费者应用程序收到的权威性的版本，供应商的应用程序提出了最高权威性的版本。
 
-AllJoyn peer applications authenticate each other using
-one of the auth mechanisms detailed in this section.
-These auth mechanisms are designed based on the security
-constructs in [RFC 5246](http://www.rfc-base.org/txt/rfc-5246.txt) and
-[RFC 5054](http://www.rfc-editor.org/rfc/rfc5054.txt). Applicable RFC
-sections are listed when describing details for these auth mechanisms.
+3. 该供应商的应用程序生成一个交换全局唯一标识符METHOD_RETURN消息并将其通过AllJoyn路由器发送到消费者应用程序。这个消息包括身份验证提供者应用的全局唯一标识符以及身份验证供应商的应用程序最大的版本。
 
-**NOTE:** For the authentication message flows captured in this section,
-the consumer and provider apps are also referred to as client
-and server respectively, to correspond with terminology used
-in [RFC 5246](http://www.rfc-base.org/txt/rfc-5246.txt) and
-[RFC 5054](http://www.rfc-editor.org/rfc/rfc5054.txt).
+4.消费者应用验证,它支持获得身份验证的版本。这就完成了交换全局唯一标识符的一步。
 
-### Use of D-Bus SASL protocol
+##应用到应用的认证
 
-The AllJoyn framework implements the D-Bus SASL exchange protocol
-[D-Bus Specification](http://dbus.freedesktop.org/doc/dbus-specification.html) to exchange
-authentication-related data. All authentication-related
-exchanges are done using the AuthChallenge method call/reply
-defined as part of the org.alljoyn.Bus.Peer.Authentication
-interface implemented by the AllJoyn core library.
+AllJoyn对等应用程序彼此进行身份验证时使用的身份验证机制详细的在这一节中。这些身份验证机制的设计是基于安全构造(RFC 5246)(http://www.rfc - base.org/txt/rfc - 5246. - txt)和(RFC 5054)(http://www.rfc-editor.org/rfc/rfc5054.txt)。适用的RFC部分在描述这些身份验证机制的细节时列出。
 
-Auth data to be exchanged is generated as a SASL string
-based on the D-Bus SASL exchange protocol. Auth data inside
-the SASL string is sent in the hex form. The generated string
-is then passed as a parameter to the AuthChallenge method call
-or method reply.
+* *注:* *为身份验证消息流可在本节中见到，使用者和提供者应用程序也被称为客户机和服务器，分别与术语用于(RFC 5246)(http://www.rfc - base.org/txt/rfc - 5246. - txt) 和 (RFC 5054)(http://www.rfc editor.org/rfc/rfc5054.txt)。
 
-For example, to initiate authentication for ALLJOYN_SRP_KEYX,
-generated string would be:
+### D-SASL总线协议的使用
 
+在AllJoyn框架实现的D-Bus SASL交换协议[D-总线规范（http://dbus.freedesktop.org/doc/dbus-specification.html）交换验证相关的数据。所有认证相关的交换通过AuthChallenge方法调用完成/回复，定义为org.alljoyn.Bus.Peer.Authentication的一部分。接口由AllJoyn核心库实现。
+
+身份验证数据交换作为SASL字符串生成基于d - bus SASL交换协议。身份验证数据在SASL字符串发送十六进制形式。然后生成的字符串作为参数传递给AuthChallenge方法调用或方法的回复。
+
+例如，要启动对ALLJOYN SRP KEY认证，生成的字符串是：
 ```
 "AUTH ALLJOYN_SRP_KEYX <c_rand in hex>"
 ```
 
-This includes the SASL AUTH command, auth mechanism, and auth data in hex form.
+这包括SASL AUTH命令,身份验证机制,以十六进制形式的身份验证数据。
 
-The following table captures the D-Bus SASL commands supported
-by the AllJoyn framework.
+下表捕获D-Bus SASL命令由AllJoyn框架的支持。
 
-#### D-Bus SASL commands supported by the AllJoyn framework
+#### d - bus SASL AllJoyn框架支持的命令
 
-| Command | Direction | Description |
+| 命令 | 方向 | 描述 |
 |---|---|---|
-| AUTH [mechanism] [initial-response] | Consumer->Provider | Start the authentication. |
-| CANCEL | Consumer->Provider | Cancel the authentication. |
-| BEGIN | <ul><li>Consumer->Provider</li><li>Provider->Consumer</li></ul> | <ul><li>On the consumer side, acknowledge that the consumer has received an OK command from the provider, and that the stream of messages is about to begin.</li><li>From the provider side, sent by the provider as response to BEGIN command from the consumer.</li></ul> |
-| DATA | <ul><li>Consumer->Provider</li><li>Provider->Consumer</li></ul> | On the consumer or provider side, contains a hex-encoded block of data to be interpreted according to the auth mechanism in use. |
-| OK | Consumer->Provider  | The client has been authenticated. |
-| REJECTED | Consumer->Provider | On the consumer side, indicates that the current authentication exchange has failed, and further exchange of DATA is inappropriate. The consumer tries another mechanism, or tries providing different responses to challenges. |
-| ERROR | <ul><li>Consumer->Provider</li><li>Provider->Consumer</li></ul> | On the consumer or provider side, either the provider or consumer did not know a command, does not accept the given command in the current context, or did not understand the arguments to the command. |
+| 身份验证[机制] [最初——反应] | 消费者->供货商| 开启验证 |
+| 取消 | 消费者->供货商 | 取消验证。 |
+| 开始 | <ul><li>消费者->供货商</li><li>供货商->消费者</li></ul> | <ul><li>在消费者方面，确认了消费者已经从提供者接收的一个OK的命令，该消息流即将开始。</li><li>|在供应商方面,由供应商发送的响应开始引起消费者的需求。
+</li></ul> |
+| 数据 | <ul><li>消费者->供应商</li><li>供应商->消费者</li></ul>在消费者或提供者方面，包含数据的一个十六进制编码的块来根据所使用的身份验证机制来解释。|
+| OK | 消费者->供应商 | 客户端已经通过身份验证。 |
+| 拒绝 | 消费者->供应商 | 在消费者方面,表明当前交换身份验证失败,并进一步的数据交换是不合适的。消费者尝试另一个机制,或尝试提供不同的应对挑战。 |
+| 错误 | <ul><li>消费者->供应商</li><li>供应商->消费者</li></ul>|在使用者或提供者方面,提供者或消费者不知道命令,在当前背景下,不接受给定的命令,或不了解的命令的参数。 |
 
 ### ALLJOYN_SRP_KEYX
 
-The following figure shows the message flow for the ALLJOYN_SRP_KEYX
-auth mechanism. This auth mechanism is primarily designed for use
-cases where a one-time use password is generated by both sides.
+下图显示了ALLJOYN_SRP_KEYX AUTH机制消息流。这个身份验证机制主要设计用于其中通过双方产生的一次性使用密码的用例。
 
-![alljoyn-srp-keyx-auth-mechanism][alljoyn-srp-keyx-auth-mechanism]
+![alljoyn-srp-keyx-身份验证-机制][alljoyn-srp-keyx-auth-mechanism]
 
-**Figure:** ALLJOYN_SRP_KEYX auth mechanism
+**Figure:** ALLJOYN_SRP_KEYX 身份验证机制
 
-The message flow steps are described below.
+消息流的步骤如下所述。
 
-1. The consumer app generates a 28 bytes client random string c_rand.
-2. The consumer (client) app generates an AuthChallenge METHOD_CALL
-message and passes "AUTH ALLJOYN_SRP_KEYX &lt;c_rand&gt;" as parameter
-in that message. The consumer app sends the method call to the
-provider (server) app via the AllJoyn router.
-3. The provider app invokes the AuthListener callback registered
-by the application to request for a password. The AuthListener
-returns the password. A username of "anonymous" is used in this case.
-4. The provider app computes the server's public value B as
-per the algorithm in section 2.5.3 of [RFC 5054](http://www.rfc-editor.org/rfc/rfc5054.txt).
-5. The provider app generates an AuthChallenge METHOD_RETURN
-message to send a server key exchange message to the client.
-The provider app passes "DATA &lt;N:g:s:B&gt;" as parameter to that
-message. Refer to section 2.5.3 of [RFC 5054](http://www.rfc-editor.org/rfc/rfc5054.txt).
-The 's' is a 40 bytes random salt value. The provider app
-sends method reply to the consumer app via the AllJoyn router.
+1. T消费者应用程序生成一个28字节c_rand客户随机字符串。
+2. 消费者(客户端)程序生成一个AuthChallenge METHOD_CALL消息并通过“AUTH ALLJOYN_SRP_KEYX & lt;c_rand>”参数信息。消费者应用程序发送的方法调用
+提供者通过AllJoyn路由器(服务器)的应用。
+3.该供应商的应用程序调用由应用程序注册的要求输入密码验证侦听器回调。该AuthListener返回的密码。 “匿名”的用户名在这种情况下使用。
+4.该供应商的应用程序计算服务器的公共值B作为每个在RFC5054]第2.5.3算法（http://www.rfc-editor.org/rfc/rfc5054.txt）。
+5. 该供应商的应用程序产生一个验证挑战METHOD_RETURN邮件发送服务器密钥交换消息给客户端。提供者的应用通过“DATA＆LT;N：摹S：B＆gt;”中作为参数传递给该消息。请参阅[RFC5054]第2.5.3（http://www.rfc-editor.org/rfc/rfc5054.txt）。'S'的是一个40字节的随机盐值。该供应商的应用程序的方法回复通过AllJoyn路由器消费者应用程序发送。
 6. The consumer app validates the values of N, g, s and B per
 section 2.5.3 of [RFC 5054](http://www.rfc-editor.org/rfc/rfc5054.txt).
 7. The consumer app computes the client's public value A per
